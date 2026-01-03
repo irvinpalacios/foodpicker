@@ -106,7 +106,6 @@ def search_places(cuisine: str) -> list[dict]:
     payload = {
         "textQuery": f"{cuisine} food near 92117",
         "minRating": MIN_RATING,
-        "minReviews": MIN_REVIEWS,
         "openNow": True,
     }
     response = requests.post(url, headers=headers, json=payload, timeout=30)
