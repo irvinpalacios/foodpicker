@@ -138,11 +138,9 @@ def create_calendar_event(calendar_service, place: dict, event_date: datetime.da
     calendar_id = st.secrets["CALENDAR_ID"]
     start_dt = datetime.combine(event_date, time(18, 0), tzinfo=TIMEZONE)
     end_dt = datetime.combine(event_date, time(20, 0), tzinfo=TIMEZONE)
-    partner_email = st.secrets.get("PARTNER_EMAIL")
-    user_email = st.secrets.get("USER_EMAIL")
-    if not user_email and "@" in calendar_id:
-        user_email = calendar_id
-    attendees = [email for email in [user_email, partner_email] if email]
+    
+    # We removed the 'attendees' logic here to fix the 403 error
+
     event = {
         "summary": f"Dinner @ {get_place_name(place)}",
         "location": place.get("formattedAddress", ""),
@@ -158,10 +156,12 @@ def create_calendar_event(calendar_service, place: dict, event_date: datetime.da
             "dateTime": end_dt.isoformat(),
             "timeZone": TIMEZONE.key,
         },
-        "attendees": [{"email": email} for email in attendees],
+        # "attendees": ... <-- REMOVED THIS LINE
     }
+    
+    # Removed 'sendUpdates="all"' because we aren't emailing anyone anymore
     calendar_service.events().insert(
-        calendarId=calendar_id, body=event, sendUpdates="all"
+        calendarId=calendar_id, body=event
     ).execute()
 
 
