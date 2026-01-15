@@ -184,9 +184,16 @@ def format_history_row(place: dict, cuisine: str, event_date: datetime.date) -> 
 st.set_page_config(page_title="Weekly New Restaurant Night", page_icon="🍽️")
 st.header("Weekly New Restaurant Night")
 
+cuisine_options = ["Random choice"] + CUISINES
+selected_cuisine = st.selectbox("Cuisine to look for", cuisine_options)
+
 if st.button("Roll the Dice"):
     try:
-        cuisine_choice = random.choice(CUISINES)
+        cuisine_choice = (
+            random.choice(CUISINES)
+            if selected_cuisine == "Random choice"
+            else selected_cuisine
+        )
         monday_date = get_next_monday_date()
 
         sheets_service, calendar_service = build_google_clients()
