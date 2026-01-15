@@ -184,12 +184,15 @@ def format_history_row(place: dict, cuisine: str, event_date: datetime.date) -> 
 st.set_page_config(page_title="Weekly New Restaurant Night", page_icon="🍽️")
 st.header("Weekly New Restaurant Night")
 
+if "pending_selection" not in st.session_state:
+    st.session_state.pending_selection = None
+
 if st.button("Roll the Dice"):
     try:
         cuisine_choice = random.choice(CUISINES)
         monday_date = get_next_monday_date()
 
-        sheets_service, calendar_service = build_google_clients()
+        sheets_service, _ = build_google_clients()
         history_ids = fetch_history_place_ids(sheets_service)
         places = search_places(cuisine_choice)
         chosen_place = choose_place(places, history_ids)
@@ -200,21 +203,52 @@ if st.button("Roll the Dice"):
             )
             st.stop()
 
-        history_row = format_history_row(chosen_place, cuisine_choice, monday_date)
-        append_history_row(sheets_service, history_row)
-        create_calendar_event(calendar_service, chosen_place, monday_date)
-
-        st.subheader(get_place_name(chosen_place))
-        st.write(
-            f"{cuisine_choice} | {chosen_place.get('rating', 'N/A')} ⭐"
-        )
-        maps_uri = chosen_place.get("googleMapsUri")
-        if maps_uri:
-            st.markdown(f"[View on Google Maps]({maps_uri})")
-
-        st.success("History Updated")
-        st.success("Calendar Invite Sent")
+        st.session_state.pending_selection = {
+            "place": chosen_place,
+            "cuisine": cuisine_choice,
+            "event_date": monday_date,
+        }
     except requests.HTTPError as exc:
         st.error(f"Places API error: {exc}")
     except Exception as exc:
         st.error(f"Something went wrong: {exc}")
+
+pending_selection = st.session_state.pending_selection
+if pending_selection:
+    chosen_place = pending_selection["place"]
+    cuisine_choice = pending_selection["cuisine"]
+    monday_date = pending_selection["event_date"]
+
+    st.subheader(get_place_name(chosen_place))
+    st.write(f"{cuisine_choice} | {chosen_place.get('rating', 'N/A')} ⭐")
+    maps_uri = chosen_place.get("googleMapsUri")
+    if maps_uri:
+        st.markdown(f"[View on Google Maps]({maps_uri})")
+
+    st.info(
+        "Confirm to add this dinner to the Google Calendar and log it in the history."
+    )
+    confirm_col, cancel_col = st.columns(2)
+    with confirm_col:
+        confirm = st.button("Confirm & Create")
+    with cancel_col:
+        cancel = st.button("Cancel")
+
+    if confirm:
+        try:
+            sheets_service, calendar_service = build_google_clients()
+            history_row = format_history_row(chosen_place, cuisine_choice, monday_date)
+            append_history_row(sheets_service, history_row)
+            create_calendar_event(calendar_service, chosen_place, monday_date)
+
+            st.success("History Updated")
+            st.success("Calendar Invite Sent")
+            st.session_state.pending_selection = None
+        except requests.HTTPError as exc:
+            st.error(f"Places API error: {exc}")
+        except Exception as exc:
+            st.error(f"Something went wrong: {exc}")
+
+    if cancel:
+        st.session_state.pending_selection = None
+        st.info("Selection cleared. Roll again to pick a new restaurant.")
