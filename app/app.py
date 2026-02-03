@@ -181,40 +181,415 @@ def format_history_row(place: dict, cuisine: str, event_date: datetime.date) -> 
     ]
 
 
-st.set_page_config(page_title="Weekly New Restaurant Night", page_icon="🍽️")
-st.header("Weekly New Restaurant Night")
+# ============================================================================
+# PREMIUM DARK MODE CONFIGURATION
+# ============================================================================
+st.set_page_config(
+    page_title="Weekly New Restaurant Night",
+    page_icon="🍽️",
+    layout="centered"  # Mobile-first card layout
+)
+
+# ============================================================================
+# EMBEDDED CSS STYLING - PREMIUM DARK MODE
+# ============================================================================
+st.markdown("""
+<style>
+    /* ===== GLOBAL DARK MODE THEME ===== */
+    :root {
+        --primary-gradient-start: #ff6b35;
+        --primary-gradient-end: #f7931e;
+        --bg-dark: #0a0a0a;
+        --bg-card: #1a1a1a;
+        --text-primary: #ffffff;
+        --text-secondary: #b0b0b0;
+        --shadow-glow: rgba(255, 107, 53, 0.3);
+    }
+    
+    /* Dark background for entire app */
+    .stApp {
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        color: var(--text-primary);
+    }
+    
+    /* Hide default Streamlit branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
+    /* ===== HERO TYPOGRAPHY WITH GRADIENT ===== */
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 900;
+        text-align: center;
+        background: linear-gradient(
+            135deg,
+            var(--primary-gradient-start) 0%,
+            var(--primary-gradient-end) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 2rem 0 1rem 0;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        text-shadow: 0 0 40px var(--shadow-glow);
+        animation: fadeInDown 0.8s ease-out;
+    }
+    
+    .hero-subtitle {
+        text-align: center;
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        margin-bottom: 3rem;
+        font-weight: 300;
+        letter-spacing: 0.05em;
+    }
+    
+    /* ===== BIG BUTTON THEORY ===== */
+    /* Override Streamlit's default small button */
+    .stButton > button {
+        width: 100% !important;
+        height: 75px !important;
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        background: linear-gradient(
+            135deg,
+            var(--primary-gradient-start) 0%,
+            var(--primary-gradient-end) 100%
+        ) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 16px !important;
+        box-shadow: 
+            0 8px 24px rgba(255, 107, 53, 0.4),
+            0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        cursor: pointer !important;
+        letter-spacing: 0.05em !important;
+        text-transform: uppercase !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 
+            0 12px 32px rgba(255, 107, 53, 0.5),
+            0 6px 16px rgba(0, 0, 0, 0.4) !important;
+    }
+    
+    .stButton > button:active {
+        transform: translateY(0px) !important;
+    }
+    
+    /* ===== CONTENT CARDS ===== */
+    .result-card {
+        background: var(--bg-card);
+        border-radius: 20px;
+        padding: 2rem;
+        margin: 2rem 0;
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .restaurant-name {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        background: linear-gradient(
+            135deg,
+            #ffffff 0%,
+            var(--primary-gradient-end) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .restaurant-details {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        margin: 1rem 0;
+    }
+    
+    /* ===== STREAMLIT COMPONENT OVERRIDES ===== */
+    .stMarkdown {
+        color: var(--text-primary);
+    }
+    
+    .stSuccess {
+        background-color: rgba(34, 197, 94, 0.1) !important;
+        border-left: 4px solid #22c55e !important;
+        color: #86efac !important;
+        border-radius: 8px !important;
+    }
+    
+    .stWarning {
+        background-color: rgba(251, 191, 36, 0.1) !important;
+        border-left: 4px solid #fbbf24 !important;
+        color: #fde047 !important;
+        border-radius: 8px !important;
+    }
+    
+    .stError {
+        background-color: rgba(239, 68, 68, 0.1) !important;
+        border-left: 4px solid #ef4444 !important;
+        color: #fca5a5 !important;
+        border-radius: 8px !important;
+    }
+    
+    /* Links styling */
+    a {
+        color: var(--primary-gradient-end) !important;
+        text-decoration: none !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    a:hover {
+        color: var(--primary-gradient-start) !important;
+        text-decoration: underline !important;
+    }
+    
+    /* ===== METRICS STYLING ===== */
+    [data-testid="stMetricValue"] {
+        font-size: 2rem !important;
+        font-weight: 700 !important;
+        color: var(--text-primary) !important;
+    }
+    
+    [data-testid="stMetricLabel"] {
+        color: var(--text-secondary) !important;
+        font-size: 0.9rem !important;
+        font-weight: 500 !important;
+    }
+    
+    [data-testid="metric-container"] {
+        background: rgba(255, 255, 255, 0.02) !important;
+        padding: 1rem !important;
+        border-radius: 12px !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
+    
+    /* ===== LINK BUTTON STYLING ===== */
+    .stLinkButton > a {
+        background: linear-gradient(
+            135deg,
+            var(--primary-gradient-start) 0%,
+            var(--primary-gradient-end) 100%
+        ) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 14px 28px !important;
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+        text-decoration: none !important;
+        box-shadow: 
+            0 6px 20px rgba(255, 107, 53, 0.3),
+            0 3px 10px rgba(0, 0, 0, 0.2) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        display: inline-block !important;
+        width: 100% !important;
+        text-align: center !important;
+    }
+    
+    .stLinkButton > a:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 
+            0 8px 28px rgba(255, 107, 53, 0.4),
+            0 4px 14px rgba(0, 0, 0, 0.3) !important;
+        text-decoration: none !important;
+    }
+    
+    /* ===== CONTAINER STYLING ===== */
+    [data-testid="stVerticalBlock"] > div:has(> div[data-testid="stVerticalBlock"]) {
+        background: var(--bg-card) !important;
+        border-radius: 20px !important;
+        padding: 2rem !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+    }
+    
+    /* ===== SPINNER STYLING ===== */
+    .stSpinner > div {
+        border-top-color: var(--primary-gradient-end) !important;
+    }
+    
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* ===== MOBILE RESPONSIVENESS ===== */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .stButton > button {
+            height: 65px !important;
+            font-size: 1.2rem !important;
+        }
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ============================================================================
+# HERO SECTION
+# ============================================================================
+st.markdown("""
+    <div class="hero-title">
+        🍽️ Weekly New Restaurant Night
+    </div>
+    <div class="hero-subtitle">
+        Discover your next culinary adventure
+    </div>
+""", unsafe_allow_html=True)
 
 if st.button("Roll the Dice"):
+    # ============================================================================
+    # GAMIFIED UX - SLOT MACHINE EXPERIENCE
+    # ============================================================================
+    
+    # Fun loading messages for latency masking
+    loading_messages = [
+        "🎰 Spinning the culinary wheel...",
+        "🍜 Consulting the foodie gods...",
+        "🎲 Rolling for flavor...",
+        "🔮 Divining your next meal...",
+        "🌟 Searching for deliciousness...",
+        "🎯 Hunting down the perfect spot...",
+    ]
+    
     try:
-        cuisine_choice = random.choice(CUISINES)
-        monday_date = get_next_monday_date()
+        with st.spinner(random.choice(loading_messages)):
+            # Perform all API calls inside spinner
+            cuisine_choice = random.choice(CUISINES)
+            monday_date = get_next_monday_date()
 
-        sheets_service, calendar_service = build_google_clients()
-        history_ids = fetch_history_place_ids(sheets_service)
-        places = search_places(cuisine_choice)
-        chosen_place = choose_place(places, history_ids)
+            sheets_service, calendar_service = build_google_clients()
+            history_ids = fetch_history_place_ids(sheets_service)
+            places = search_places(cuisine_choice)
+            chosen_place = choose_place(places, history_ids)
 
-        if not chosen_place:
-            st.warning(
-                "No eligible restaurants found for that cuisine. Try rolling again."
-            )
-            st.stop()
+            if not chosen_place:
+                st.warning(
+                    "🎰 No eligible restaurants found for that cuisine. Try rolling again!"
+                )
+                st.stop()
 
-        history_row = format_history_row(chosen_place, cuisine_choice, monday_date)
-        append_history_row(sheets_service, history_row)
-        create_calendar_event(calendar_service, chosen_place, monday_date)
-
-        st.subheader(get_place_name(chosen_place))
-        st.write(
-            f"{cuisine_choice} | {chosen_place.get('rating', 'N/A')} ⭐"
-        )
-        maps_uri = chosen_place.get("googleMapsUri")
-        if maps_uri:
-            st.markdown(f"[View on Google Maps]({maps_uri})")
-
-        st.success("History Updated")
-        st.success("Calendar Invite Sent")
+            history_row = format_history_row(chosen_place, cuisine_choice, monday_date)
+            append_history_row(sheets_service, history_row)
+            create_calendar_event(calendar_service, chosen_place, monday_date)
+        
+        # ============================================================================
+        # 🎉 CELEBRATION - Trigger balloons immediately on success!
+        # ============================================================================
+        st.balloons()
+        
+        # ============================================================================
+        # THE REVEAL - Dramatic result card with border
+        # ============================================================================
+        with st.container(border=True):
+            # Restaurant name with gradient styling
+            st.markdown(f"""
+                <div class="restaurant-name" style="text-align: center; margin-bottom: 1rem;">
+                    {get_place_name(chosen_place)}
+                </div>
+            """, unsafe_allow_html=True)
+            
+            # Cuisine badge
+            st.markdown(f"""
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <span style="
+                        background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+                        color: white;
+                        padding: 8px 20px;
+                        border-radius: 20px;
+                        font-weight: 600;
+                        font-size: 1rem;
+                        letter-spacing: 0.05em;
+                    ">
+                        🍴 {cuisine_choice}
+                    </span>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            # ============================================================================
+            # METRICS OVER TEXT - Use st.metric for rating and reviews
+            # ============================================================================
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.metric(
+                    label="⭐ Rating",
+                    value=f"{chosen_place.get('rating', 'N/A')}"
+                )
+            
+            with col2:
+                reviews_count = chosen_place.get('userRatingCount', 0)
+                st.metric(
+                    label="💬 Reviews",
+                    value=f"{reviews_count:,}" if isinstance(reviews_count, int) else reviews_count
+                )
+            
+            with col3:
+                price_level = chosen_place.get('priceLevel', 'N/A')
+                price_display = '💰' * len(price_level) if isinstance(price_level, str) and price_level != 'N/A' else price_level
+                st.metric(
+                    label="💵 Price",
+                    value=price_display
+                )
+            
+            # Spacer
+            st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
+            
+            # ============================================================================
+            # CALL TO ACTION - Primary action button for Google Maps
+            # ============================================================================
+            maps_uri = chosen_place.get("googleMapsUri")
+            if maps_uri:
+                st.link_button(
+                    label="📍 View on Google Maps",
+                    url=maps_uri,
+                    use_container_width=True,
+                    type="primary"
+                )
+        
+        # Success messages with spacing
+        st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
+        
+        col_success1, col_success2 = st.columns(2)
+        with col_success1:
+            st.success("✅ History Updated")
+        with col_success2:
+            st.success("📅 Calendar Invite Sent")
+            
     except requests.HTTPError as exc:
-        st.error(f"Places API error: {exc}")
+        st.error(f"🚨 Places API error: {exc}")
     except Exception as exc:
-        st.error(f"Something went wrong: {exc}")
+        st.error(f"🚨 Something went wrong: {exc}")
