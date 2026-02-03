@@ -534,7 +534,7 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.markdown("""
         <div class="hero-title">
-            🍽️ Weekly New Restaurant Night
+            &#127869;&#65039; Weekly New Restaurant Night
         </div>
         <div class="hero-subtitle">
             Discover your next culinary adventure
@@ -542,7 +542,10 @@ with col2:
     """, unsafe_allow_html=True)
     
     # The MEGA BUTTON - centered in middle column
-    button_clicked = st.button("🎲 Roll the Dice")
+    # Add centering wrapper
+    st.markdown('<div style="display: flex; justify-content: center;">', unsafe_allow_html=True)
+    button_clicked = st.button("&#127922; Roll the Dice")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 if button_clicked:
@@ -630,7 +633,7 @@ if button_clicked:
             # Restaurant name - THE VISUAL HERO
             st.markdown(f"""
                 <div class="restaurant-name" style="text-align: center; margin-bottom: 1rem;">
-                    🏆 {get_place_name(chosen_place)}
+                    &#127942; {get_place_name(chosen_place)}
                 </div>
             """, unsafe_allow_html=True)
             
@@ -638,7 +641,7 @@ if button_clicked:
             st.markdown(f"""
                 <div style="text-align: center; margin-bottom: 1.5rem;">
                     <span class="badge">
-                        🍴 {cuisine_choice}
+                        &#127860; {cuisine_choice}
                     </span>
                 </div>
             """, unsafe_allow_html=True)
