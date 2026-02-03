@@ -1,6 +1,7 @@
 import json
 import random
-from datetime import datetime, time, timedelta
+import time
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 import pandas as pd
@@ -136,8 +137,8 @@ def get_place_name(place: dict) -> str:
 
 def create_calendar_event(calendar_service, place: dict, event_date: datetime.date) -> None:
     calendar_id = st.secrets["CALENDAR_ID"]
-    start_dt = datetime.combine(event_date, time(18, 0), tzinfo=TIMEZONE)
-    end_dt = datetime.combine(event_date, time(20, 0), tzinfo=TIMEZONE)
+    start_dt = datetime.combine(event_date, datetime.time(18, 0), tzinfo=TIMEZONE)
+    end_dt = datetime.combine(event_date, datetime.time(20, 0), tzinfo=TIMEZONE)
     
     # We removed the 'attendees' logic here to fix the 403 error
 
@@ -568,7 +569,6 @@ if button_clicked:
         # ============================================================================
         # SLOT MACHINE ANIMATION LOOP - Build Anticipation!
         # ============================================================================
-        import time
         
         # Start API calls in background while animating
         start_time = time.time()
