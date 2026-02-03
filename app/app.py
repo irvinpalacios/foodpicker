@@ -246,12 +246,12 @@ st.markdown("""
         letter-spacing: 0.05em;
     }
     
-    /* ===== BIG BUTTON THEORY ===== */
+    /* ===== BIG BUTTON THEORY - THE MEGA BUTTON ===== */
     /* Override Streamlit's default small button */
     .stButton > button {
         width: 100% !important;
-        height: 75px !important;
-        font-size: 1.5rem !important;
+        height: 70px !important;
+        font-size: 1.6rem !important;
         font-weight: 700 !important;
         background: linear-gradient(
             135deg,
@@ -268,17 +268,35 @@ st.markdown("""
         cursor: pointer !important;
         letter-spacing: 0.05em !important;
         text-transform: uppercase !important;
+        position: relative !important;
     }
     
+    /* PULSE HOVER EFFECT */
     .stButton > button:hover {
         transform: translateY(-2px) !important;
         box-shadow: 
-            0 12px 32px rgba(255, 107, 53, 0.5),
+            0 12px 32px rgba(255, 107, 53, 0.6),
             0 6px 16px rgba(0, 0, 0, 0.4) !important;
+        animation: pulse 1.5s infinite !important;
     }
     
     .stButton > button:active {
         transform: translateY(0px) !important;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            box-shadow: 
+                0 12px 32px rgba(255, 107, 53, 0.6),
+                0 6px 16px rgba(0, 0, 0, 0.4),
+                0 0 0 0 rgba(255, 107, 53, 0.7);
+        }
+        50% {
+            box-shadow: 
+                0 12px 32px rgba(255, 107, 53, 0.6),
+                0 6px 16px rgba(0, 0, 0, 0.4),
+                0 0 0 15px rgba(255, 107, 53, 0);
+        }
     }
     
     /* ===== CONTENT CARDS ===== */
@@ -294,9 +312,42 @@ st.markdown("""
         animation: fadeInUp 0.6s ease-out;
     }
     
+    /* ===== SLOT MACHINE ANIMATION ===== */
+    .slot-machine-text {
+        font-size: 2.5rem;
+        font-weight: 800;
+        text-align: center;
+        background: linear-gradient(
+            135deg,
+            var(--primary-gradient-start) 0%,
+            var(--primary-gradient-end) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 3rem 0;
+        letter-spacing: -0.01em;
+        animation: slotSpin 0.3s ease-in-out;
+    }
+    
+    @keyframes slotSpin {
+        0% {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.9);
+        }
+        50% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(20px) scale(0.9);
+        }
+    }
+    
+    /* ===== WINNER REVEAL - HERO TYPOGRAPHY ===== */
     .restaurant-name {
-        font-size: 2rem;
-        font-weight: 700;
+        font-size: 2.8rem;
+        font-weight: 900;
         color: var(--text-primary);
         margin-bottom: 0.5rem;
         background: linear-gradient(
@@ -307,6 +358,21 @@ st.markdown("""
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+    }
+    
+    /* Badge for cuisine and rating */
+    .badge {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+        color: white;
+        padding: 10px 24px;
+        border-radius: 24px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        letter-spacing: 0.05em;
+        box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
     }
     
     .restaurant-details {
@@ -459,52 +525,98 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ============================================================================
-# HERO SECTION
+# HERO SECTION - PERFECTLY CENTERED
 # ============================================================================
-st.markdown("""
-    <div class="hero-title">
-        🍽️ Weekly New Restaurant Night
-    </div>
-    <div class="hero-subtitle">
-        Discover your next culinary adventure
-    </div>
-""", unsafe_allow_html=True)
+# Use columns to center content
+col1, col2, col3 = st.columns([1, 2, 1])
 
-if st.button("Roll the Dice"):
+with col2:
+    st.markdown("""
+        <div class="hero-title">
+            🍽️ Weekly New Restaurant Night
+        </div>
+        <div class="hero-subtitle">
+            Discover your next culinary adventure
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # The MEGA BUTTON - centered in middle column
+    button_clicked = st.button("🎲 Roll the Dice")
+
+
+if button_clicked:
     # ============================================================================
     # GAMIFIED UX - SLOT MACHINE EXPERIENCE
     # ============================================================================
     
-    # Fun loading messages for latency masking
-    loading_messages = [
-        "🎰 Spinning the culinary wheel...",
-        "🍜 Consulting the foodie gods...",
-        "🎲 Rolling for flavor...",
-        "🔮 Divining your next meal...",
-        "🌟 Searching for deliciousness...",
-        "🎯 Hunting down the perfect spot...",
+    # Create placeholder for slot machine animation
+    slot_placeholder = st.empty()
+    
+    # Fun cuisine teasers for the slot machine
+    cuisine_teasers = [
+        f"� Craving {CUISINES[0]}?",
+        f"🍣 Maybe {CUISINES[5]}?",
+        f"� How about {CUISINES[21]}?",
+        f"🌶️ Spicy {CUISINES[19]}?",
+        f"🥘 Exotic {CUISINES[27]}?",
+        f"� Delicious {CUISINES[18]}?",
+        f"🥙 Tasty {CUISINES[24]}?",
+        f"🍛 Savory {CUISINES[26]}?",
     ]
     
     try:
-        with st.spinner(random.choice(loading_messages)):
-            # Perform all API calls inside spinner
-            cuisine_choice = random.choice(CUISINES)
-            monday_date = get_next_monday_date()
-
-            sheets_service, calendar_service = build_google_clients()
-            history_ids = fetch_history_place_ids(sheets_service)
-            places = search_places(cuisine_choice)
-            chosen_place = choose_place(places, history_ids)
-
-            if not chosen_place:
-                st.warning(
-                    "🎰 No eligible restaurants found for that cuisine. Try rolling again!"
-                )
-                st.stop()
-
-            history_row = format_history_row(chosen_place, cuisine_choice, monday_date)
-            append_history_row(sheets_service, history_row)
-            create_calendar_event(calendar_service, chosen_place, monday_date)
+        # ============================================================================
+        # SLOT MACHINE ANIMATION LOOP - Build Anticipation!
+        # ============================================================================
+        import time
+        
+        # Start API calls in background while animating
+        start_time = time.time()
+        
+        # Perform API calls
+        cuisine_choice = random.choice(CUISINES)
+        monday_date = get_next_monday_date()
+        sheets_service, calendar_service = build_google_clients()
+        history_ids = fetch_history_place_ids(sheets_service)
+        places = search_places(cuisine_choice)
+        chosen_place = choose_place(places, history_ids)
+        
+        if not chosen_place:
+            slot_placeholder.empty()
+            st.warning(
+                "🎰 No eligible restaurants found for that cuisine. Try rolling again!"
+            )
+            st.stop()
+        
+        history_row = format_history_row(chosen_place, cuisine_choice, monday_date)
+        append_history_row(sheets_service, history_row)
+        create_calendar_event(calendar_service, chosen_place, monday_date)
+        
+        # Calculate remaining time to reach 2 seconds
+        elapsed = time.time() - start_time
+        remaining_time = max(0, 2.0 - elapsed)
+        
+        # Continue animation for remaining time or at least show a few cycles
+        animation_end = time.time() + remaining_time
+        cycle_count = 0
+        
+        while time.time() < animation_end or cycle_count < 6:
+            # Randomly pick a cuisine teaser
+            teaser = random.choice(cuisine_teasers)
+            
+            # Display with slot machine animation
+            slot_placeholder.markdown(f"""
+                <div class="slot-machine-text">
+                    {teaser}
+                </div>
+            """, unsafe_allow_html=True)
+            
+            # Fast cycling (0.15 seconds per change)
+            time.sleep(0.15)
+            cycle_count += 1
+        
+        # Clear the slot machine animation
+        slot_placeholder.empty()
         
         # ============================================================================
         # 🎉 CELEBRATION - Trigger balloons immediately on success!
@@ -512,43 +624,52 @@ if st.button("Roll the Dice"):
         st.balloons()
         
         # ============================================================================
-        # THE REVEAL - Dramatic result card with border
+        # THE WINNER REVEAL - Dramatic result card with border
         # ============================================================================
         with st.container(border=True):
-            # Restaurant name with gradient styling
+            # Restaurant name - THE VISUAL HERO
             st.markdown(f"""
                 <div class="restaurant-name" style="text-align: center; margin-bottom: 1rem;">
-                    {get_place_name(chosen_place)}
+                    🏆 {get_place_name(chosen_place)}
                 </div>
             """, unsafe_allow_html=True)
             
-            # Cuisine badge
+            # Cuisine badge using styled HTML
             st.markdown(f"""
                 <div style="text-align: center; margin-bottom: 1.5rem;">
-                    <span style="
-                        background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
-                        color: white;
-                        padding: 8px 20px;
-                        border-radius: 20px;
-                        font-weight: 600;
-                        font-size: 1rem;
-                        letter-spacing: 0.05em;
-                    ">
+                    <span class="badge">
                         🍴 {cuisine_choice}
                     </span>
                 </div>
             """, unsafe_allow_html=True)
             
             # ============================================================================
-            # METRICS OVER TEXT - Use st.metric for rating and reviews
+            # BADGE SYSTEM - Visual metrics display
             # ============================================================================
             col1, col2, col3 = st.columns(3)
             
             with col1:
+                rating = chosen_place.get('rating', 'N/A')
                 st.metric(
                     label="⭐ Rating",
-                    value=f"{chosen_place.get('rating', 'N/A')}"
+                    value=f"{rating}"
                 )
+                # Add visual badge for high ratings
+                if isinstance(rating, (int, float)) and rating >= 4.5:
+                    st.markdown("""
+                        <div style="text-align: center;">
+                            <span style="
+                                background: linear-gradient(135deg, #fbbf24, #f59e0b);
+                                color: white;
+                                padding: 4px 12px;
+                                border-radius: 12px;
+                                font-size: 0.75rem;
+                                font-weight: 600;
+                            ">
+                                🌟 Top Rated
+                            </span>
+                        </div>
+                    """, unsafe_allow_html=True)
             
             with col2:
                 reviews_count = chosen_place.get('userRatingCount', 0)
@@ -590,6 +711,9 @@ if st.button("Roll the Dice"):
             st.success("📅 Calendar Invite Sent")
             
     except requests.HTTPError as exc:
+        slot_placeholder.empty()
         st.error(f"🚨 Places API error: {exc}")
     except Exception as exc:
+        slot_placeholder.empty()
         st.error(f"🚨 Something went wrong: {exc}")
+
