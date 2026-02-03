@@ -1,7 +1,7 @@
 import json
 import random
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time as dt_time
 from zoneinfo import ZoneInfo
 
 import pandas as pd
@@ -137,8 +137,8 @@ def get_place_name(place: dict) -> str:
 
 def create_calendar_event(calendar_service, place: dict, event_date: datetime.date) -> None:
     calendar_id = st.secrets["CALENDAR_ID"]
-    start_dt = datetime.combine(event_date, datetime.time(18, 0), tzinfo=TIMEZONE)
-    end_dt = datetime.combine(event_date, datetime.time(20, 0), tzinfo=TIMEZONE)
+    start_dt = datetime.combine(event_date, dt_time(18, 0), tzinfo=TIMEZONE)
+    end_dt = datetime.combine(event_date, dt_time(20, 0), tzinfo=TIMEZONE)
     
     # We removed the 'attendees' logic here to fix the 403 error
 
