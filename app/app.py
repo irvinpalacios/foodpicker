@@ -555,13 +555,13 @@ if button_clicked:
     # Fun cuisine teasers for the slot machine
     cuisine_teasers = [
         f"� Craving {CUISINES[0]}?",
-        f"🍣 Maybe {CUISINES[5]}?",
-        f"� How about {CUISINES[21]}?",
-        f"🌶️ Spicy {CUISINES[19]}?",
-        f"🥘 Exotic {CUISINES[27]}?",
-        f"� Delicious {CUISINES[18]}?",
-        f"🥙 Tasty {CUISINES[24]}?",
-        f"🍛 Savory {CUISINES[26]}?",
+        f"🍣 Maybe {CUISINES[2]}?",        # Japanese
+        f"� How about {CUISINES[8]}?",
+        f"🌶️ Spicy {CUISINES[6]}?",       # Thai
+        f"🥘 Exotic {CUISINES[14]}?",      # Ethiopian
+        f"� Delicious {CUISINES[4]}?",
+        f"🥙 Tasty {CUISINES[12]}?",       # Lebanese
+        f"🍛 Savory {CUISINES[13]}?",      # Indian
     ]
     
     try:
